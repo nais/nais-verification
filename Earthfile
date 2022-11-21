@@ -1,0 +1,12 @@
+VERSION 0.6
+
+docker:
+    FROM busybox
+
+    # builtins must be declared
+    ARG EARTHLY_GIT_PROJECT_NAME
+    ARG EARTHLY_GIT_SHORT_HASH
+
+    ARG IMAGE_BASE=ghcr.io/$EARTHLY_GIT_PROJECT_NAME
+    ARG VERSION=$EARTHLY_GIT_SHORT_HASH
+    SAVE IMAGE --push ${IMAGE_BASE}:${VERSION} ${IMAGE_BASE}:latest

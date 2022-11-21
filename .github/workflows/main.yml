@@ -1,0 +1,57 @@
+name: Build and deploy nais-verification
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    paths-ignore:
+      - hack/**
+      - charts/**
+
+env:
+  image_base: ghcr.io/${{ github.repository }}
+  cache_image: ghcr.io/${{ github.repository }}/cache
+
+jobs:
+  build:
+    name: Build and push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Generate image environment variable
+        id: set-image-tag
+        run: |
+          version="$(date +%Y%m%d%H%M%S)-$(git describe --always --dirty --exclude '*')"
+          echo "version=${version}" >> $GITHUB_OUTPUT
+      - name: Login to GitHub Packages Docker Registry
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a # Use commit-sha1 instead of tag for security concerns
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: "Pull latest image so it exists locally and can be used by cache :crossed_fingers:"
+        run: docker pull "${image_base}:latest"
+      - name: Build and possibly push
+        env:
+          EARTHLY_PUSH: "${{ github.ref == 'refs/heads/main' }}"
+        run: |
+          ./earthlyw --ci --output "--remote-cache=${cache_image}" +docker "--IMAGE_BASE=${image_base}" "--VERSION=${{ steps.set-image-tag.outputs.version }}"
+    outputs:
+      version: "${{ steps.set-image-tag.outputs.version }}"
+
+# TODO:
+#  deploy-fasit:
+#    name: Deploy to Fasit
+#    if: github.ref == 'refs/heads/main'
+#    runs-on: fasit-deploy
+#    permissions:
+#      id-token: write
+#    needs:
+#      - build
+#    steps:
+#      - uses: nais/fasit-deploy@main
+#        with:
+#          json: '{"image": {"tag": "${{ needs.build.outputs.version }}"}}'
+#          feature_name: nais-verification
