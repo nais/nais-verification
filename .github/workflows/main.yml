@@ -33,6 +33,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: "Pull latest image so it exists locally and can be used by cache :crossed_fingers:"
         run: docker pull "${image_base}:latest"
+        continue-on-error: true
       - name: Build and possibly push
         env:
           EARTHLY_PUSH: "${{ github.ref == 'refs/heads/main' }}"
