@@ -1,7 +1,30 @@
 VERSION 0.6
 
+ARG PY_VERSION=3.10
+
+build:
+    FROM python:${PY_VERSION}-slim
+
+    WORKDIR /app
+
+    RUN pip install poetry poetry-plugin-bundle
+
+    COPY pyproject.toml poetry.lock .
+    RUN poetry install --no-root --no-interaction
+
+    COPY --dir README.md .prospector.yaml nais_verification tests .
+    RUN poetry install --no-interaction
+    RUN poetry run prospector
+    RUN poetry run pytest
+
+    RUN poetry bundle venv --without=dev venv
+    SAVE ARTIFACT venv venv
+
 docker:
-    FROM busybox
+    FROM navikt/python:${PY_VERSION}
+
+    COPY --dir +build/venv .
+    CMD ["/app/venv/bin/nais-verification"]
 
     # builtins must be declared
     ARG EARTHLY_GIT_PROJECT_NAME

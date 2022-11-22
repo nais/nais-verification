@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "nais-verification"
+version = "0.1.0"
+description = ""
+authors = ["Morten Lied Johansen <morten.lied.johansen@nav.no>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "nais_verification"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.2.0"
+prospector = "^1.7.7"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+nais-verification = "nais_verification.main:main"
