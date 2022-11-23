@@ -2,8 +2,10 @@
 import argparse
 import enum
 
-from .team import create_team  # NOQA: Imported for dynamic lookup
-from .deploy_key import create_deploy_key  # NOQA: Imported for dynamic lookup
+from fiaas_logging import init_logging
+
+from nais_verification.team import create_team  # NOQA: Imported for dynamic lookup
+from nais_verification.deploy_key import create_deploy_key  # NOQA: Imported for dynamic lookup
 
 
 class Actions(enum.Enum):
@@ -27,6 +29,7 @@ class Actions(enum.Enum):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("action", help="Which action to take", choices=Actions, type=Actions)
+    init_logging()
     options = parser.parse_args()
     options.action.execute()
 
