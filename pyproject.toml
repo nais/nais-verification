@@ -11,8 +11,9 @@ packages = [{include = "nais_verification"}]
 python = "^3.10"
 pydantic = "^1.10.2"
 gql = {version = "^3.4.0", extras = ["requests"]}
-requests = "^2.28.1"
-fiaas-logging = "^0.1.1"
+requests = "<3"
+fiaas-logging = "<1"
+k8s = "<1"
 
 
 [tool.poetry.group.dev.dependencies]

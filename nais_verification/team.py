@@ -5,14 +5,9 @@ from gql import Client, gql
 from gql.transport.requests import RequestsHTTPTransport
 
 from nais_verification.auth import BearerAuth
-
+from nais_verification.settings import Settings
 
 LOG = logging.getLogger(__name__)
-
-
-class Settings(BaseSettings):
-    CONSOLE_API_URL: str
-    CONSOLE_API_TOKEN: str
 
 
 def create_team():
