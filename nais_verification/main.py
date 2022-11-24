@@ -11,21 +11,17 @@ from nais_verification.deploy_key import create_deploy_key  # NOQA: Imported for
 
 
 class Actions(enum.Enum):
-    @staticmethod
-    def _generate_next_value_(name: str, *args) -> str:
-        return name.lower().replace("_", "-")
-
-    CREATE_TEAM = enum.auto()
-    CREATE_DEPLOY_KEY = enum.auto()
+    def __new__(cls, func):
+        obj = object.__new__(cls)
+        obj.execute = func
+        obj._value_ = func.__name__.replace("_", "-")
+        return obj
 
     def __str__(self):
         return self.value
 
-    def execute(self, dry_run):
-        func = globals().get(self.name.lower())
-        if not func:
-            raise RuntimeError(f"No function defined for action {self.value}")
-        func(dry_run)
+    CREATE_TEAM = (create_team,)
+    CREATE_DEPLOY_KEY = (create_deploy_key,)
 
 
 def main():
