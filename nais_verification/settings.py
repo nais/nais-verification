@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     CONSOLE_API_URL: str
     CONSOLE_API_TOKEN: str
 
+    # Only need to override these when running outside a cluster
     K8S_API_URL: str = ""
     K8S_API_TOKEN: str = ""
     K8S_API_CERT_PATH: Path = ""

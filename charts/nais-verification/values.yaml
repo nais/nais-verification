@@ -1,3 +1,15 @@
 # Default values for nais-verification.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+
+
+image:
+  repository: ghcr.io/nais/nais-verification
+  tag: latest
+  pullPolicy: IfNotPresent
+
+secretName: nais-verification-deploy-key
+
+console:
+  api_url: http://console  # Mapped in fasit
+  api_token: "" # Mapped in fasit
