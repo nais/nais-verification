@@ -35,7 +35,7 @@ def _configure_k8s(settings: Settings):
 
 def _save_key_to_cluster(dry_run: bool, settings: Settings, deploy_key: str):
     _configure_k8s(settings)
-    object_meta = ObjectMeta(name=settings.SECRET_NAME, namespace=settings.TEAM_NAME)
+    object_meta = ObjectMeta(name=settings.SECRET_NAME, namespace=settings.SECRET_NAMESPACE)
     secret = Secret.get_or_create(metadata=object_meta)
     secret.stringData["DEPLOY_API_KEY"] = deploy_key
     if dry_run:
