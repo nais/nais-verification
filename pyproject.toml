@@ -9,7 +9,7 @@ packages = [{include = "nais_verification"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-pydantic = "^1.10.2"
+pydantic = "^1.10.3"
 gql = {version = "^3.4.0", extras = ["requests"]}
 requests = "<3"
 fiaas-logging = "<1"
