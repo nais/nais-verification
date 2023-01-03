@@ -11,6 +11,7 @@ metadata:
     "helm.sh/hook-weight": "5"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 spec:
+  suspend: true  # Suspended until needed APIs are in place
   template:
     metadata:
       labels:
@@ -39,6 +40,8 @@ spec:
             cpu: 200m
             memory: 256Mi
         securityContext:
+          seccompProfile:
+            type: RuntimeDefault
           allowPrivilegeEscalation: false
           capabilities:
             drop:
