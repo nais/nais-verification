@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "nais-verification.fullname" . }}
+  name: {{ include "nais-verification.fullname" . }}-team
   labels:
     {{- include "nais-verification.labels" . | nindent 4 }}
   annotations:
