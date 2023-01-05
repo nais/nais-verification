@@ -15,6 +15,35 @@ def create_team(dry_run: bool):
     transport = RequestsHTTPTransport(settings.CONSOLE_API_URL, auth=auth, verify=True)
     client = Client(transport=transport, fetch_schema_from_transport=True)
 
+    if not _team_exists(client, settings):
+        _create_team(client, dry_run, settings)
+
+
+def _team_exists(client, settings):
+    query = gql(
+        """
+        query team($slug: Slug!) {
+          team(slug: $slug) {
+            slug
+            syncErrors {
+              error
+            }
+          }
+        }
+        """
+    )
+    params = {
+        "slug": settings.TEAM_NAME,
+    }
+    LOG.info("Looking up team %r", settings.TEAM_NAME)
+    result = client.execute(query, variable_values=params)
+    LOG.info(result)
+    data = result.get("data", {})
+    team = data.get("team", {})
+    return team.get("slug") == settings.TEAM_NAME
+
+
+def _create_team(client, dry_run, settings):
     mutation = gql(
         """
         mutation createTeam($slug: Slug!, $purpose: String!, $slackAlertsChannel: String!) {
