@@ -42,17 +42,16 @@ jobs:
     outputs:
       version: "${{ steps.set-image-tag.outputs.version }}"
 
-# TODO:
-#  deploy-fasit:
-#    name: Deploy to Fasit
-#    if: github.ref == 'refs/heads/main'
-#    runs-on: fasit-deploy
-#    permissions:
-#      id-token: write
-#    needs:
-#      - build
-#    steps:
-#      - uses: nais/fasit-deploy@main
-#        with:
-#          json: '{"image": {"tag": "${{ needs.build.outputs.version }}"}}'
-#          feature_name: nais-verification
+  deploy-fasit:
+    name: Deploy to Fasit
+    if: github.ref == 'refs/heads/main'
+    runs-on: fasit-deploy
+    permissions:
+      id-token: write
+    needs:
+      - build
+    steps:
+      - uses: nais/fasit-deploy@main
+        with:
+          json: '{"image": {"tag": "${{ needs.build.outputs.version }}"}}'
+          feature_name: nais-verification
