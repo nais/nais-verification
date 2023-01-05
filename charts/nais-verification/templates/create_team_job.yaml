@@ -25,10 +25,6 @@ spec:
         - secretRef:
             name: {{ include "nais-verification.fullname" . }}
         env:
-          - name: SECRET_NAME
-            value: "{{ .Values.secretName }}"
-          - name: SECRET_NAMESPACE
-            value: "{{ .Release.Namespace }}"
           - name: TEAM_CHANNEL
             value: "{{ .Values.slackChannel }}"
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
