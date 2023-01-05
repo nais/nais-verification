@@ -20,3 +20,5 @@ class Settings(BaseSettings):
 
     SECRET_NAME: str = "nais-verification-deploy-key"
     SECRET_NAMESPACE: str = "nais-system"
+
+    LOG_LEVEL: str = "WARNING"
