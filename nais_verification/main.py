@@ -2,6 +2,7 @@
 import argparse
 import enum
 import logging
+import sys
 
 from fiaas_logging import init_logging
 from gql.transport.requests import log as requests_logger
@@ -31,7 +32,11 @@ def main():
     init_logging()
     requests_logger.setLevel(logging.WARNING)
     options = parser.parse_args()
-    options.action.execute(options.dry_run)
+    try:
+        options.action.execute(options.dry_run)
+    except Exception as e:
+        logging.exception("An error occured: %s", e)
+        sys.exit(127)
 
 
 if __name__ == '__main__':
