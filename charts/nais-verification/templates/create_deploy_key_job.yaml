@@ -1,3 +1,4 @@
+{{ if false }} # Skip creation until console API implemented
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -11,7 +12,6 @@ metadata:
     "helm.sh/hook-weight": "5"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 spec:
-  suspend: true  # Suspended until needed APIs are in place
   template:
     metadata:
       labels:
@@ -60,3 +60,4 @@ spec:
       - emptyDir:
           medium: "Memory"
         name: writable-tmp
+{{ end }}
