@@ -9,6 +9,7 @@ image:
   pullPolicy: IfNotPresent
 
 secretName: nais-verification-deploy-key
+slackChannel: "#nais"
 
 console:
   api_url: http://console  # Mapped in fasit

@@ -16,6 +16,7 @@ class Settings(BaseSettings):
 
     TEAM_NAME: str = "nais-verification"
     TEAM_PURPOSE: str = "A place for NAIS to run verification workloads"
+    TEAM_CHANNEL: str = "#nais"
 
     SECRET_NAME: str = "nais-verification-deploy-key"
     SECRET_NAMESPACE: str = "nais-system"

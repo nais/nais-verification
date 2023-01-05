@@ -17,10 +17,11 @@ def create_team(dry_run: bool):
 
     mutation = gql(
         """
-        mutation createTeam($slug: Slug!, $purpose: String!) {
+        mutation createTeam($slug: Slug!, $purpose: String!, $slackAlertsChannel: String!) {
           createTeam(input: {
             slug: $slug,
-            purpose: $purpose
+            purpose: $purpose,
+            slackAlertsChannel: $slackAlertsChannel
           }) {
             syncErrors {
               reconciler,
@@ -33,6 +34,7 @@ def create_team(dry_run: bool):
     params = {
         "slug": settings.TEAM_NAME,
         "purpose": settings.TEAM_PURPOSE,
+        "slackAlertsChannel": settings.TEAM_CHANNEL,
     }
     LOG.info("Creating team %r", settings.TEAM_NAME)
     if not dry_run:

@@ -29,6 +29,8 @@ spec:
             value: "{{ .Values.secretName }}"
           - name: SECRET_NAMESPACE
             value: "{{ .Release.Namespace }}"
+          - name: TEAM_CHANNEL
+            value: "{{ .Values.slackChannel }}"
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         name: {{ .Chart.Name }}
