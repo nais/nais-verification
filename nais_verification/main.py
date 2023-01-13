@@ -30,15 +30,26 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("action", help="Which action to take", choices=Actions, type=Actions)
     parser.add_argument("-n", "--dry-run", help="Do a dry run, with no actual action taken", action="store_true")
-    init_logging()
-    settings = Settings()
-    requests_logger.setLevel(logging.getLevelName(settings.LOG_LEVEL))
+    _configure_logging()
     options = parser.parse_args()
     try:
         options.action.execute(options.dry_run)
     except Exception as e:
         logging.exception("An error occured: %s", e)
         sys.exit(127)
+
+
+def _configure_logging():
+    settings = Settings()
+    log_level = logging.getLevelName(settings.LOG_LEVEL)
+    init_logging()
+    root = logging.getLogger()
+    root.setLevel(log_level)
+    # requests can be noisy, so restrict to WARNING and above unless specifically asking for DEBUG
+    if log_level >= logging.WARNING or log_level == logging.DEBUG:
+        requests_logger.setLevel(log_level)
+    else:
+        requests_logger.setLevel(logging.WARNING)
 
 
 if __name__ == '__main__':

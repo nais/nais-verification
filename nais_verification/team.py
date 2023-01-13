@@ -1,4 +1,5 @@
 import logging
+from pprint import pformat
 
 from gql import Client, gql
 from gql.transport.exceptions import TransportQueryError
@@ -39,7 +40,7 @@ def _team_exists(client, settings):
     LOG.info("Looking up team %r", settings.TEAM_NAME)
     try:
         result = client.execute(query, variable_values=params)
-        LOG.info(result)
+        LOG.debug("result from team query: %s", pformat(result))
         team = result.get("team", {})
         return team.get("slug") == settings.TEAM_NAME
     except TransportQueryError as e:
@@ -73,7 +74,7 @@ def _create_team(client, dry_run, settings):
     if not dry_run:
         try:
             result = client.execute(mutation, variable_values=params)
-            LOG.info(result)
+            LOG.debug("result from createTeam: %s", pformat(result))
         except TransportQueryError as e:
             LOG.error("Failed to create team:\n\t%s", _format_errors(e))
             raise RuntimeError("Failed to create team") from e
