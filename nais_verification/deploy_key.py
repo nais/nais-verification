@@ -61,10 +61,10 @@ def _get_team_deploy_key(settings: Settings) -> str:
     params = {
         "slug": settings.TEAM_NAME,
     }
-    LOG.info(f"Get team deploy key for team %r", settings.TEAM_NAME)
+    LOG.info("Get team deploy key for team %r", settings.TEAM_NAME)
     try:
         result = client.execute(query, variable_values=params)
-        LOG.debug("result from getDeployKey query: %s", pf(result))
+        LOG.debug("result from getDeployKey query: %s", pformat(result))
         deploy_key = result.get("deployKey", "")
         return deploy_key
     except TransportQueryError as e:
