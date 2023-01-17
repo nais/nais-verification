@@ -1,4 +1,3 @@
-{{ if false }} # Skip creation until console API implemented
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -60,4 +59,3 @@ spec:
       - emptyDir:
           medium: "Memory"
         name: writable-tmp
-{{ end }}
