@@ -1,15 +1,15 @@
 from pathlib import Path
 from typing import Optional
 
-from pydantic import BaseSettings, HttpUrl
+from pydantic import BaseSettings, AnyHttpUrl
 
 
 class Settings(BaseSettings):
-    CONSOLE_API_URL: HttpUrl
+    CONSOLE_API_URL: AnyHttpUrl
     CONSOLE_API_TOKEN: str
 
     # Only need to override these when running outside a cluster
-    K8S_API_URL: HttpUrl = None
+    K8S_API_URL: AnyHttpUrl = None
     K8S_API_TOKEN: str = ""
     K8S_API_CERT_PATH: Optional[Path] = None
     K8S_API_KEY_PATH: Optional[Path] = None
