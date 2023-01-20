@@ -1,0 +1,51 @@
+{{- define "nais-verification.job-template" -}}
+metadata:
+  labels:
+    {{- include "nais-verification.selectorLabels" $ | nindent 4 }}
+spec:
+  restartPolicy: OnFailure
+  containers:
+  - command:
+    - "/app/venv/bin/nais-verification"
+    - "{{ .command }}"
+    envFrom:
+    - secretRef:
+        name: {{ include "nais-verification.fullname" . }}
+    env:
+    - name: TEAM_CHANNEL
+      value: "{{ .Values.slackChannel }}"
+    - name: SECRET_NAME
+      value: "{{ .Values.secretName }}"
+    - name: SECRET_NAMESPACE
+      value: "{{ .Release.Namespace }}"
+    image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+    imagePullPolicy: {{ .Values.image.pullPolicy }}
+    name: {{ .Chart.Name }}
+    resources:
+      limits:
+        memory: 512Mi
+      requests:
+        cpu: 200m
+        memory: 256Mi
+    securityContext:
+      seccompProfile:
+        type: RuntimeDefault
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsGroup: 1069
+      runAsNonRoot: true
+      runAsUser: 1069
+    volumeMounts:
+    - mountPath: /tmp
+      name: writable-tmp
+  securityContext: {}
+  serviceAccountName: {{ include "nais-verification.serviceAccountName" . }}
+  volumes:
+  - emptyDir:
+      medium: "Memory"
+    name: writable-tmp
+{{- end }}

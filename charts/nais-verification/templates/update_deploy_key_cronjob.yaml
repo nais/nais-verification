@@ -1,0 +1,14 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "nais-verification.fullname" . }}-deploy-key
+  labels:
+    {{- include "nais-verification.labels" . | nindent 4 }}
+spec:
+  concurrencyPolicy: "Forbid"
+  schedule: "*/5 * * * *"
+  startingDeadlineSeconds: 600
+  jobTemplate:
+    spec:
+      template:
+        {{- include "nais-verification.job-template" (set . "command" "create-deploy-key") | nindent 8 }}
