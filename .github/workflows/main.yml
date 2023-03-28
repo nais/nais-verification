@@ -45,6 +45,10 @@ jobs:
         run: |
           docker pull "${{ env.image_base }}:${{ steps.set-image-tag.outputs.version }}"
           echo "digest=$(docker inspect ${{ env.image_base }}:${{ steps.set-image-tag.outputs.version }} | jq -r '.[].RepoDigests[0]')" >> $GITHUB_OUTPUT
+      - name: Install cosign
+        uses: sigstore/cosign-installer@bd2d1189b064bcddc3903176a807dcdba72d7fd0 # ratchet:sigstore/cosign-installer@main
+        with:
+          cosign-release: 'v2.0.0'
       - name: Sign the container image
         if: github.ref == 'refs/heads/main'
         run: cosign sign --yes ${{ env.image_base }}@${{ steps.imgdigest.outputs.digest }}
