@@ -41,11 +41,6 @@ jobs:
           - europe-north1-docker.pkg.dev/nais-io/nais/images/nais-verification
     steps:
       - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # ratchet:actions/checkout@v3
-      - name: Generate image environment variable
-        id: set-image-tag
-        run: |
-          version="$(date +%Y%m%d%H%M%S)-$(git describe --always --dirty --exclude '*')"
-          echo "version=${version}" >> $GITHUB_OUTPUT
       - id: "auth"
         if: github.ref == 'refs/heads/main'
         name: "Authenticate to Google Cloud"
