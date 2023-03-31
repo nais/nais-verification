@@ -9,8 +9,8 @@ on:
       - charts/**
       - "*.md"
 env:
-  image_base: ghcr.io/${{ github.repository }}
   cache_image: ghcr.io/${{ github.repository }}/cache
+
 jobs:
   build:
     name: Build and push
@@ -19,6 +19,11 @@ jobs:
       contents: read
       packages: write
       id-token: write
+    strategy:
+      matrix:
+        image_base:
+          - ghcr.io/${{ github.repository }}
+          - europe-north1-docker.pkg.dev/nais-io/nais/images/nais-verification
     steps:
       - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # ratchet:actions/checkout@v3
       - name: Generate image environment variable
@@ -26,6 +31,21 @@ jobs:
         run: |
           version="$(date +%Y%m%d%H%M%S)-$(git describe --always --dirty --exclude '*')"
           echo "version=${version}" >> $GITHUB_OUTPUT
+      - id: "auth"
+        if: github.ref == 'refs/heads/main'
+        name: "Authenticate to Google Cloud"
+        uses: "google-github-actions/auth@ef5d53e30bbcd8d0836f4288f5e50ff3e086997d" # ratchet:google-github-actions/auth@v1.0.0
+        with:
+          workload_identity_provider: ${{ secrets.NAIS_IO_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: "gh-kafkarator@nais-io.iam.gserviceaccount.com"
+          token_format: "access_token"
+      - name: Login to Google Artifact Registry
+        if: github.ref == 'refs/heads/main'
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a # ratchet:docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: "oauth2accesstoken"
+          password: "${{ steps.auth.outputs.access_token }}"
       - name: Login to GitHub Packages Docker Registry
         uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a # ratchet:docker/login-action@v2
         with:
@@ -33,19 +53,28 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: "Pull latest image so it exists locally and can be used by cache :crossed_fingers:"
-        run: docker pull "${image_base}:latest"
+        run: docker pull "${{ matrix.image_base }}:latest"
         continue-on-error: true
+      - name: Install earthly
+        uses: earthly/actions-setup@cce953f2ea75f5ff76f6483a788bac66a733de3a # ratchet:earthly/actions-setup@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and possibly push
         env:
           EARTHLY_PUSH: "${{ github.ref == 'refs/heads/main' }}"
+          EARTHLY_USE_INLINE_CACHE: true
+          EARTHLY_SAVE_INLINE_CACHE: true
+          EARTHLY_VERBOSE: true
+          EARTHLY_FULL_TARGET: true
+          EARTHLY_OUTPUT: true
         run: |
-          ./earthlyw --ci --output "--remote-cache=${cache_image}" +docker "--IMAGE_BASE=${image_base}" "--VERSION=${{ steps.set-image-tag.outputs.version }}"
+          earthly "--remote-cache=${cache_image}" +docker "--IMAGE_BASE=${{ matrix.image_base }}" "--VERSION=${{ steps.set-image-tag.outputs.version }}"
       - name: Retrieve image digest
         id: imgdigest
         if: github.ref == 'refs/heads/main'
         run: |
-          docker pull "${{ env.image_base }}:${{ steps.set-image-tag.outputs.version }}"
-          echo "digest=$(docker inspect ${{ env.image_base }}:${{ steps.set-image-tag.outputs.version }} | jq -r '.[].RepoDigests[0]')" >> $GITHUB_OUTPUT
+          docker pull "${{ matrix.image_base }}:${{ steps.set-image-tag.outputs.version }}"
+          echo "digest=$(docker inspect ${{ matrix.image_base }}:${{ steps.set-image-tag.outputs.version }} | jq -r '.[].RepoDigests[0]')" >> $GITHUB_OUTPUT
       - name: Install cosign
         uses: sigstore/cosign-installer@8348525c79cd67509c593a9352954618bdc3a862 # ratchet:sigstore/cosign-installer@main
         with:
