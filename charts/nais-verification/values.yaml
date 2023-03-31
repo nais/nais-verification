@@ -4,7 +4,7 @@
 
 
 image:
-  repository: ghcr.io/nais/nais-verification
+  repository: europe-north1-docker.pkg.dev/nais-io/nais/images/nais-verification
   tag: latest
   pullPolicy: IfNotPresent
 
