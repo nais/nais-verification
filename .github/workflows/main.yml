@@ -13,9 +13,23 @@ env:
   REGISTRY: europe-north1-docker.pkg.dev/nais-io/nais/images
 
 jobs:
+  version:
+    name: Build and push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # ratchet:actions/checkout@v3
+      - name: Generate image environment variable
+        id: set-image-tag
+        run: |
+          version="$(date +%Y%m%d%H%M%S)-$(git describe --always --dirty --exclude '*')"
+          echo "version=${version}" >> $GITHUB_OUTPUT
+    outputs:
+      version: ${{ steps.set-image-tag.outputs.version }}
   build:
     name: Build and push
     runs-on: ubuntu-latest
+    needs:
+      - version
     permissions:
       contents: read
       packages: write
@@ -69,13 +83,13 @@ jobs:
           EARTHLY_FULL_TARGET: true
           EARTHLY_OUTPUT: true
         run: |
-          earthly "--remote-cache=${cache_image}" +docker "--IMAGE_BASE=${{ matrix.image_base }}" "--VERSION=${{ steps.set-image-tag.outputs.version }}"
+          earthly "--remote-cache=${cache_image}" +docker "--IMAGE_BASE=${{ matrix.image_base }}" "--VERSION=${{ needs.version.outputs.version }}"
       - name: Retrieve image digest
         id: imgdigest
         if: github.ref == 'refs/heads/main'
         run: |
-          docker pull "${{ matrix.image_base }}:${{ steps.set-image-tag.outputs.version }}"
-          echo "digest=$(docker inspect ${{ matrix.image_base }}:${{ steps.set-image-tag.outputs.version }} | jq -r '.[].RepoDigests[0]')" >> $GITHUB_OUTPUT
+          docker pull "${{ matrix.image_base }}:${{ needs.version.outputs.version }}"
+          echo "digest=$(docker inspect ${{ matrix.image_base }}:${{ needs.version.outputs.version }} | jq -r '.[].RepoDigests[0]')" >> $GITHUB_OUTPUT
       - name: Install cosign
         uses: sigstore/cosign-installer@8348525c79cd67509c593a9352954618bdc3a862 # ratchet:sigstore/cosign-installer@main
         with:
@@ -94,8 +108,6 @@ jobs:
       - name: Attest image
         if: github.ref == 'refs/heads/main'
         run: cosign attest --yes --predicate cyclone.sbom.json --type cyclonedx ${{ steps.imgdigest.outputs.digest }}
-    outputs:
-      version: "${{ steps.set-image-tag.outputs.version }}"
   deploy-fasit:
     name: Deploy to Fasit
     if: github.ref == 'refs/heads/main'
@@ -103,9 +115,10 @@ jobs:
     permissions:
       id-token: write
     needs:
+      - version
       - build
     steps:
       - uses: nais/fasit-deploy@b2c0b6d049b53bef41b321eec406fe66938576fd # ratchet:nais/fasit-deploy@main
         with:
-          json: '{"image": {"tag": "${{ needs.build.outputs.version }}"}}'
+          json: '{"image": {"tag": "${{ needs.version.outputs.version }}"}}'
           feature_name: nais-verification
