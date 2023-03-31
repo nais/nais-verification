@@ -24,7 +24,7 @@ jobs:
       matrix:
         image_base:
           - ghcr.io/${{ github.repository }}
-          - ${{ env.REGISTRY }}/nais-verification
+          - europe-north1-docker.pkg.dev/nais-io/nais/images/nais-verification
     steps:
       - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # ratchet:actions/checkout@v3
       - name: Generate image environment variable
