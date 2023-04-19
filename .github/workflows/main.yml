@@ -41,6 +41,12 @@ jobs:
           - europe-north1-docker.pkg.dev/nais-io/nais/images/nais-verification
     steps:
       - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # ratchet:actions/checkout@v3
+      - name: Install cosign
+        uses: sigstore/cosign-installer@8348525c79cd67509c593a9352954618bdc3a862 # ratchet:sigstore/cosign-installer@main
+        with:
+          cosign-release: 'v2.0.0'
+      - name: Verify runner image
+        run: cosign verify --certificate-identity https://github.com/chainguard-images/images/.github/workflows/release.yaml@refs/heads/main --certificate-oidc-issuer https://token.actions.githubusercontent.com cgr.dev/chainguard/python:3.10
       - id: "auth"
         if: github.ref == 'refs/heads/main'
         name: "Authenticate to Google Cloud"
@@ -85,10 +91,6 @@ jobs:
         run: |
           docker pull "${{ matrix.image_base }}:${{ needs.version.outputs.version }}"
           echo "digest=$(docker inspect ${{ matrix.image_base }}:${{ needs.version.outputs.version }} | jq -r '.[].RepoDigests[0]')" >> $GITHUB_OUTPUT
-      - name: Install cosign
-        uses: sigstore/cosign-installer@8348525c79cd67509c593a9352954618bdc3a862 # ratchet:sigstore/cosign-installer@main
-        with:
-          cosign-release: 'v2.0.0'
       - name: Sign the container image
         if: github.ref == 'refs/heads/main'
         run: cosign sign --yes ${{ steps.imgdigest.outputs.digest }}

@@ -21,10 +21,13 @@ build:
     SAVE ARTIFACT venv venv
 
 docker:
-    FROM navikt/python:${PY_VERSION}
+    FROM cgr.dev/chainguard/python:${PY_VERSION}
+
+    WORKDIR /app
+    ENV PYTHONPATH=/app/venv/lib/python${PY_VERSION}/site-packages
 
     COPY --dir +build/venv .
-    CMD ["/app/venv/bin/nais-verification"]
+    ENTRYPOINT ["python", "/app/venv/bin/nais-verification"]
 
     # builtins must be declared
     ARG EARTHLY_GIT_PROJECT_NAME
