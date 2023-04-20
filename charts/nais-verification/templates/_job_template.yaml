@@ -6,6 +6,7 @@ spec:
   restartPolicy: OnFailure
   containers:
   - command:
+    - "python"
     - "/app/venv/bin/nais-verification"
     - "{{ .command }}"
     envFrom:
