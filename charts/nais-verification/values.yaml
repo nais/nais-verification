@@ -11,6 +11,6 @@ image:
 secretName: nais-verification-deploy-key
 slackChannel: "#nais"
 
-console:
-  api_url: http://console  # Mapped in fasit
-  api_token: "" # Mapped in fasit
+naisTeams:
+  apiUrl: http://teams-backend  # Mapped in fasit
+  apiToken: "" # Mapped in fasit

@@ -13,8 +13,8 @@ LOG = logging.getLogger(__name__)
 
 def create_team(dry_run: bool):
     settings = Settings()
-    auth = BearerAuth(settings.CONSOLE_API_TOKEN)
-    transport = RequestsHTTPTransport(settings.CONSOLE_API_URL, auth=auth, verify=True)
+    auth = BearerAuth(settings.NAIS_TEAMS_API_TOKEN)
+    transport = RequestsHTTPTransport(settings.NAIS_TEAMS_API_URL, auth=auth, verify=True)
     client = Client(transport=transport, fetch_schema_from_transport=True)
 
     if not _team_exists(client, settings):

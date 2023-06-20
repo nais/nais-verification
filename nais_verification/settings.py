@@ -5,8 +5,8 @@ from pydantic import BaseSettings, AnyHttpUrl
 
 
 class Settings(BaseSettings):
-    CONSOLE_API_URL: AnyHttpUrl
-    CONSOLE_API_TOKEN: str
+    NAIS_TEAMS_API_URL: AnyHttpUrl
+    NAIS_TEAMS_API_TOKEN: str
 
     # Only need to override these when running outside a cluster
     K8S_API_URL: AnyHttpUrl = None

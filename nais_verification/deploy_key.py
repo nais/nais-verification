@@ -47,8 +47,8 @@ def _save_key_to_cluster(dry_run: bool, settings: Settings, deploy_key: str):
 
 
 def _get_team_deploy_key(settings: Settings) -> str:
-    auth = BearerAuth(settings.CONSOLE_API_TOKEN)
-    transport = RequestsHTTPTransport(settings.CONSOLE_API_URL, auth=auth, verify=True)
+    auth = BearerAuth(settings.NAIS_TEAMS_API_TOKEN)
+    transport = RequestsHTTPTransport(settings.NAIS_TEAMS_API_URL, auth=auth, verify=True)
     client = Client(transport=transport, fetch_schema_from_transport=True)
 
     query = gql(
