@@ -31,15 +31,16 @@ spec:
     volumeMounts:
     - mountPath: /tmp
       name: writable-tmp
+    securityContext:
+      allowPrivilegeEscalation: false
+      privileged: false
+      readOnlyRootFilesystem: true
   securityContext:
     seccompProfile:
       type: RuntimeDefault
-    allowPrivilegeEscalation: false
     capabilities:
       drop:
       - ALL
-    privileged: false
-    readOnlyRootFilesystem: true
     runAsGroup: 1069
     runAsNonRoot: true
     runAsUser: 1069
