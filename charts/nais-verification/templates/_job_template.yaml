@@ -35,12 +35,12 @@ spec:
       allowPrivilegeEscalation: false
       privileged: false
       readOnlyRootFilesystem: true
+      capabilities:
+        drop:
+        - ALL
   securityContext:
     seccompProfile:
       type: RuntimeDefault
-    capabilities:
-      drop:
-      - ALL
     runAsGroup: 1069
     runAsNonRoot: true
     runAsUser: 1069
