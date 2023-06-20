@@ -28,22 +28,21 @@ spec:
       requests:
         cpu: 200m
         memory: 256Mi
-    securityContext:
-      seccompProfile:
-        type: RuntimeDefault
-      allowPrivilegeEscalation: false
-      capabilities:
-        drop:
-        - ALL
-      privileged: false
-      readOnlyRootFilesystem: true
-      runAsGroup: 1069
-      runAsNonRoot: true
-      runAsUser: 1069
     volumeMounts:
     - mountPath: /tmp
       name: writable-tmp
-  securityContext: {}
+  securityContext:
+    seccompProfile:
+      type: RuntimeDefault
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+      - ALL
+    privileged: false
+    readOnlyRootFilesystem: true
+    runAsGroup: 1069
+    runAsNonRoot: true
+    runAsUser: 1069
   serviceAccountName: {{ include "nais-verification.serviceAccountName" . }}
   volumes:
   - emptyDir:
