@@ -10,9 +10,8 @@ spec:
           kubernetes.io/metadata.name: nais-system
       podSelector:
         matchLabels:
-          app.kubernetes.io/instance: teams
-          app.kubernetes.io/name: teams
-          component: backend
+          app.kubernetes.io/instance: teams-backend
+          app.kubernetes.io/name: teams-backend
   podSelector:
     matchLabels:
       app.kubernetes.io/instance: {{ .Release.Name }}
