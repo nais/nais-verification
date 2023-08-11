@@ -21,7 +21,7 @@ build:
     SAVE ARTIFACT venv venv
 
 docker:
-    FROM cgr.dev/chainguard/python:${PY_VERSION}
+    FROM python:${PY_VERSION}-slim
 
     WORKDIR /app
     ENV PYTHONPATH=/app/venv/lib/python${PY_VERSION}/site-packages
