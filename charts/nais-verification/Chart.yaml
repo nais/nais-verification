@@ -1,6 +1,8 @@
 apiVersion: v2
 name: nais-verification
-description: A Helm chart for Fasit
+description: Creates nais-verification team for verification workloads (deploy-canary, kafka-canary etc.) and provides deploy key in a secret for other features to use
+sources:
+  - https://github.com/nais/nais-verification/tree/main/charts/nais-verification
 
 # A chart can be either an 'application' or a 'library' chart.
 #
@@ -15,4 +17,4 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.3.1
+version: invalid

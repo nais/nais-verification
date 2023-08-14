@@ -1,0 +1,26 @@
+dependencies:
+  - allOf:
+      - teams-backend
+      - hookd
+environmentKinds:
+  - management
+values:
+  console.api_token:
+    computed:
+      template: '"{{.Management.nais_verification_teams_api_key}}"'
+  console.api_url:
+    computed:
+      template: http://teams-backend/query
+  image.pullPolicy:
+    config:
+      type: string
+  image.repository:
+    config:
+      type: string
+  image.tag:
+    config:
+      type: string
+  slackChannel:
+    description: 'The name of the nais<->tenant coop channel (default #nais)'
+    config:
+      type: string
