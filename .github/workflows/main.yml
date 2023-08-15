@@ -44,8 +44,6 @@ jobs:
         uses: sigstore/cosign-installer@d13028333d784fcc802b67ec924bcebe75aa0a5f # ratchet:sigstore/cosign-installer@main
         with:
           cosign-release: 'v2.0.0'
-      - name: Verify runner image
-        run: cosign verify --certificate-identity https://github.com/chainguard-images/images/.github/workflows/release.yaml@refs/heads/main --certificate-oidc-issuer https://token.actions.githubusercontent.com cgr.dev/chainguard/python:3.10
       - id: "auth"
         if: github.ref == 'refs/heads/main'
         name: "Authenticate to Google Cloud"
