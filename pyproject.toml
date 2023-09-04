@@ -17,7 +17,7 @@ k8s = "<1"
 
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^7.4.0"
+pytest = "^7.4.1"
 prospector = "^1.10.2"
 
 [build-system]
