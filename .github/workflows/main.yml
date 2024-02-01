@@ -41,7 +41,7 @@ jobs:
     steps:
       - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # ratchet:actions/checkout@v3
       - name: Install cosign
-        uses: sigstore/cosign-installer@9614fae9e5c5eddabb09f90a270fcb487c9f7149 # ratchet:sigstore/cosign-installer@main
+        uses: sigstore/cosign-installer@e1523de7571e31dbe865fd2e80c5c7c23ae71eb4 # ratchet:sigstore/cosign-installer@main
         with:
           cosign-release: 'v2.2.1'
       - id: "auth"
