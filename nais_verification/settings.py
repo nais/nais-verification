@@ -10,8 +10,8 @@ class Settings(BaseSettings):
     NAIS_TEAMS_API_TOKEN: str
 
     # Only need to override these when running outside a cluster
-    K8S_API_URL: AnyHttpUrl = None
-    K8S_API_TOKEN: str = ""
+    K8S_API_URL: Optional[AnyHttpUrl] = None
+    K8S_API_TOKEN: Optional[str] = ""
     K8S_API_CERT_PATH: Optional[Path] = None
     K8S_API_KEY_PATH: Optional[Path] = None
     K8S_API_CA_PATH: Optional[Path] = None
