@@ -8,9 +8,6 @@ values:
   naisTeams.apiToken:
     computed:
       template: '"{{.Management.nais_verification_teams_api_key}}"'
-  naisTeams.apiUrl:
-    computed:
-      template: http://teams-backend/query
   image.pullPolicy:
     config:
       type: string
