@@ -1,6 +1,6 @@
 dependencies:
   - allOf:
-      - teams-backend
+      - nais-api
       - hookd
 environmentKinds:
   - management
