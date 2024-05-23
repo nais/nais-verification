@@ -389,13 +389,13 @@ colors = ["colorama (>=0.4.6)"]
 
 [[package]]
 name = "k8s"
-version = "0.26.0"
+version = "0.27.0"
 description = "Python client library for the Kubernetes API"
 optional = false
 python-versions = "*"
 files = [
-    {file = "k8s-0.26.0-py2.py3-none-any.whl", hash = "sha256:44a631ed8df85bf1ea9f926be567a79008b0a9898ef57c08e3042c2127feaf85"},
-    {file = "k8s-0.26.0.tar.gz", hash = "sha256:56356b4539ce841a638b6bfd16ac0de3b11fed9092d1d9cacd9e428167d50ea0"},
+    {file = "k8s-0.27.0-py2.py3-none-any.whl", hash = "sha256:dacc21b53125f6b37654404e458a78fb113966192b372dc8a6fdc4f444d522ca"},
+    {file = "k8s-0.27.0.tar.gz", hash = "sha256:de3eac76458aa11c787800840631842c45b51706403dabaf7a8b2c776829f83f"},
 ]
 
 [package.dependencies]
