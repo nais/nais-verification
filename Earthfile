@@ -1,6 +1,6 @@
 VERSION 0.8
 
-ARG --global PY_VERSION=3.10
+ARG --global PY_VERSION=3.12
 
 build:
     FROM python:${PY_VERSION}-slim
