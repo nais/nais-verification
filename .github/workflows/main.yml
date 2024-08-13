@@ -164,4 +164,3 @@ jobs:
         with:
           chart: oci://${{ env.GOOGLE_REGISTRY }}/nais-io/nais/feature/nais-verification
           version: ${{ needs.version.outputs.version }}
-          feature_name: nais-verification
