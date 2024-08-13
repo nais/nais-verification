@@ -17,7 +17,7 @@ build:
     RUN poetry run prospector
     RUN poetry run pytest
 
-    RUN poetry bundle venv --without=dev venv
+    RUN poetry bundle venv --without=dev --clear venv
     SAVE ARTIFACT venv venv
 
 docker:
