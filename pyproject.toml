@@ -14,7 +14,7 @@ gql = {version = "^3.5.0", extras = ["requests"]}
 requests = "<3"
 fiaas-logging = "<1"
 k8s = "<1"
-pydantic-settings = "^2.5.2"
+pydantic-settings = "^2.6.0"
 
 
 [tool.poetry.group.dev.dependencies]
