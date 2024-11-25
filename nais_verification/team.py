@@ -29,9 +29,6 @@ def _team_exists(client, settings):
         query team($slug: Slug!) {
           team(slug: $slug) {
             slug
-            syncErrors {
-              error
-            }
           }
         }
         """
@@ -82,9 +79,8 @@ def _create_team(client, dry_run, settings):
             purpose: $purpose,
             slackChannel: $slackChannel
           }) {
-            syncErrors {
-              reconciler,
-              error
+            team {
+              slug
             }
           }
         }
