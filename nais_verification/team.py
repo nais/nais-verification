@@ -19,8 +19,6 @@ def create_team(dry_run: bool):
 
     if not _team_exists(client, settings):
         _create_team(client, dry_run, settings)
-    else:
-        _sync_team(client, dry_run, settings)
 
 
 def _team_exists(client, settings):
@@ -45,29 +43,6 @@ def _team_exists(client, settings):
     except TransportQueryError as e:
         LOG.warning("Failed to lookup team:\n\t%s", _format_errors(e))
     return False
-
-
-def _sync_team(client, dry_run, settings):
-    mutation = gql(
-        """
-        mutation synchronizeTeam($slug: Slug!) {
-          synchronizeTeam(slug: $slug) {
-            correlationID
-          }
-        }
-        """
-    )
-    params = {
-        "slug": settings.TEAM_NAME,
-    }
-    LOG.info("Synchronizing team %r", settings.TEAM_NAME)
-    if not dry_run:
-        try:
-            result = client.execute(mutation, variable_values=params)
-            LOG.debug("result from synchronizeTeam: %s", pformat(result))
-        except TransportQueryError as e:
-            LOG.error("Failed to synchronize team:\n\t%s", _format_errors(e))
-            raise RuntimeError("Failed to synchronize team") from e
 
 
 def _create_team(client, dry_run, settings):
