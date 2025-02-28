@@ -19,7 +19,7 @@ pydantic-settings = "^2.8.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"
-prospector = "^1.14.1"
+prospector = "^1.15.1"
 setuptools = "^75.8.2"
 
 [build-system]
