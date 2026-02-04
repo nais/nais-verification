@@ -20,7 +20,7 @@ pydantic-settings = "^2.12.0"
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.4.2"
 prospector = "^1.18.0"
-setuptools = "^75.8.2"
+setuptools = "^80.10.2"
 
 [build-system]
 requires = ["poetry-core"]
