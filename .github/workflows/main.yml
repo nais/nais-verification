@@ -12,6 +12,7 @@ jobs:
     uses: nais/actions/.github/workflows/mise-build-deploy-fasit.yaml@main
     with:
       builds-chart: true
+      builds-docker: true
       deploys-to-fasit: true
       mise-tasks: '["lint", "test"]'
     secrets:
