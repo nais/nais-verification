@@ -7,11 +7,17 @@ run = """
 echo "$(date +%Y%m%d%H%M%S)-$(git describe --always --dirty --exclude '*')"
 """
 
-[tasks.build]
+[tasks.install]
 run = "poetry install"
 
+[tasks.build]
+depends = ["install"]
+run = "poetry build"
+
 [tasks.lint]
+depends = ["install"]
 run = "poetry run prospector"
 
 [tasks.test]
+depends = ["install"]
 run = "poetry run pytest"
