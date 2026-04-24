@@ -19,6 +19,6 @@ jobs:
       builds-chart: true
       builds-docker: true
       deploys-to-fasit: true
-      mise-tasks: '["lint", "test"]'
+      mise-tasks: '["lint", "test", "fmt-check"]'
     secrets:
       NAIS_IO_WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.NAIS_IO_WORKLOAD_IDENTITY_PROVIDER }}

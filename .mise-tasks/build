@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# [MISE] depends=["setup"]
+
+set -o errexit
+set -o pipefail
+
+if [[ -e poetry.lock ]]; then
+  poetry build
+elif [[ -e uv.lock ]]; then
+  UV_DYNAMIC_VERSIONING_BYPASS=${MORTENLJ_MISE_LIB_CLEAN_VERSION}
+  export UV_DYNAMIC_VERSIONING_BYPASS
+  uv build
+fi

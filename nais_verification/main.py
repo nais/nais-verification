@@ -3,13 +3,12 @@ import argparse
 import enum
 import logging
 import sys
-
 from fiaas_logging import init_logging
 from gql.transport.requests import log as requests_logger
 
+from nais_verification.deploy_key import create_deploy_key  # NOQA: Imported for dynamic lookup
 from nais_verification.settings import Settings
 from nais_verification.team import create_team  # NOQA: Imported for dynamic lookup
-from nais_verification.deploy_key import create_deploy_key  # NOQA: Imported for dynamic lookup
 
 
 class Actions(enum.Enum):
@@ -28,8 +27,15 @@ class Actions(enum.Enum):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("action", help="Which action to take", choices=Actions, type=Actions)
-    parser.add_argument("-n", "--dry-run", help="Do a dry run, with no actual action taken", action="store_true")
+    parser.add_argument(
+        "action", help="Which action to take", choices=Actions, type=Actions
+    )
+    parser.add_argument(
+        "-n",
+        "--dry-run",
+        help="Do a dry run, with no actual action taken",
+        action="store_true",
+    )
     _configure_logging()
     options = parser.parse_args()
     try:
@@ -52,5 +58,5 @@ def _configure_logging():
         requests_logger.setLevel(logging.WARNING)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

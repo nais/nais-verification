@@ -1,9 +1,8 @@
 import logging
-from pprint import pformat
-
 from gql import Client, gql
 from gql.transport.exceptions import TransportQueryError
 from gql.transport.requests import RequestsHTTPTransport
+from pprint import pformat
 
 from nais_verification.auth import BearerAuth
 from nais_verification.settings import Settings
@@ -14,7 +13,9 @@ LOG = logging.getLogger(__name__)
 def create_team(dry_run: bool):
     settings = Settings()
     auth = BearerAuth(settings.NAIS_TEAMS_API_TOKEN)
-    transport = RequestsHTTPTransport(settings.NAIS_TEAMS_API_URL, auth=auth, verify=True)
+    transport = RequestsHTTPTransport(
+        settings.NAIS_TEAMS_API_URL, auth=auth, verify=True
+    )
     client = Client(transport=transport, fetch_schema_from_transport=True)
 
     if not _team_exists(client, settings):

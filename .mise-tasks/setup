@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+
+if [[ -e poetry.lock ]]; then
+  poetry install --all-groups
+elif [[ -e uv.lock ]]; then
+  uv sync --all-groups
+fi

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# [MISE] tools={ruff="latest"}
+
+set -o errexit
+set -o pipefail
+
+ruff format

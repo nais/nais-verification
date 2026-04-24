@@ -1,30 +1,39 @@
-[tool.poetry]
+[project]
 name = "nais-verification"
 version = "0.1.0"
 description = ""
-authors = ["Morten Lied Johansen <morten.lied.johansen@nav.no>"]
-license = "MIT"
+authors = [{ name = "Morten Lied Johansen", email = "morten.lied.johansen@nav.no" }]
+requires-python = ">=3.12,<4"
 readme = "README.md"
-packages = [{include = "nais_verification"}]
+license = "MIT"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "pydantic>=2.12.5,<3",
+    "gql[requests]>=3.5.3,<4",
+    "requests<3",
+    "fiaas-logging<1",
+    "k8s<1",
+    "pydantic-settings>=2.13.1,<3",
+]
 
-[tool.poetry.dependencies]
-python = "^3.12"
-pydantic = "^2.12.5"
-gql = {version = "^3.5.3", extras = ["requests"]}
-requests = "<3"
-fiaas-logging = "<1"
-k8s = "<1"
-pydantic-settings = "^2.13.1"
+[project.scripts]
+nais-verification = "nais_verification.main:main"
 
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2,<9",
+]
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.4.2"
-prospector = "^1.18.0"
-setuptools = "^75.8.2"
+[tool.uv]
+default-groups = "all"
+
+[tool.uv.build-backend]
+module-name = ["nais_verification"]
+module-root = ""
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.scripts]
-nais-verification = "nais_verification.main:main"
+requires = ["uv_build>=0.11.7,<0.12.0"]
+build-backend = "uv_build"

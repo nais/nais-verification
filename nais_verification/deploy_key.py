@@ -1,12 +1,11 @@
 import logging
-from pprint import pformat
-
 from gql import Client, gql
 from gql.transport.exceptions import TransportQueryError
 from gql.transport.requests import RequestsHTTPTransport
 from k8s import config
 from k8s.models.common import ObjectMeta
 from k8s.models.secret import Secret
+from pprint import pformat
 
 from nais_verification.auth import BearerAuth
 from nais_verification.settings import Settings
@@ -36,7 +35,9 @@ def _configure_k8s(settings: Settings):
 
 def _save_key_to_cluster(dry_run: bool, settings: Settings, deploy_key: str):
     _configure_k8s(settings)
-    object_meta = ObjectMeta(name=settings.SECRET_NAME, namespace=settings.SECRET_NAMESPACE)
+    object_meta = ObjectMeta(
+        name=settings.SECRET_NAME, namespace=settings.SECRET_NAMESPACE
+    )
     secret = Secret.get_or_create(metadata=object_meta)
     secret.stringData = {"DEPLOY_API_KEY": deploy_key}
     if dry_run:
@@ -48,7 +49,9 @@ def _save_key_to_cluster(dry_run: bool, settings: Settings, deploy_key: str):
 
 def _get_team_deploy_key(settings: Settings) -> str:
     auth = BearerAuth(settings.NAIS_TEAMS_API_TOKEN)
-    transport = RequestsHTTPTransport(settings.NAIS_TEAMS_API_URL, auth=auth, verify=True)
+    transport = RequestsHTTPTransport(
+        settings.NAIS_TEAMS_API_URL, auth=auth, verify=True
+    )
     client = Client(transport=transport, fetch_schema_from_transport=True)
 
     query = gql(

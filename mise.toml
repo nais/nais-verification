@@ -1,23 +1,14 @@
 [tools]
-poetry = "latest"
 python = "3.12"
+uv = "latest"
 
 [tasks.version]
 run = """
 echo "$(date +%Y%m%d%H%M%S)-$(git describe --always --dirty --exclude '*')"
 """
 
-[tasks.install]
-run = "poetry install"
+[tasks.docker]
+run = "docker buildx build ."
 
-[tasks.build]
-depends = ["install"]
-run = "poetry build"
-
-[tasks.lint]
-depends = ["install"]
-run = "poetry run prospector"
-
-[tasks.test]
-depends = ["install"]
-run = "poetry run pytest"
+[tasks.ci]
+depends = ["test", "lint", "fmt-check"]
