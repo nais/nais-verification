@@ -1,166 +1,18 @@
-name: Build and deploy nais-verification
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+name: Build and Deploy
 on:
   push:
-    paths-ignore:
-      - hack/**
-      - "*.md"
-env:
-  cache_image: ghcr.io/${{ github.repository }}/cache
-  GOOGLE_REGISTRY: "europe-north1-docker.pkg.dev"
+    branches: [master]
+
+permissions:
+  contents: read
+  id-token: write
 
 jobs:
-  version:
-    name: Version
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@9a9194f87191a7e9055e3e9b95b8cfb13023bb08 # ratchet:actions/checkout@v3
-      - name: Generate image environment variable
-        id: set-image-tag
-        run: |
-          version="$(date +%Y%m%d%H%M%S)-$(git describe --always --dirty --exclude '*')"
-          echo "version=${version}" >> $GITHUB_OUTPUT
-    outputs:
-      version: ${{ steps.set-image-tag.outputs.version }}
-  build:
-    name: Build and push
-    runs-on: ubuntu-latest
-    needs:
-      - version
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
-    strategy:
-      matrix:
-        image_base:
-          - ghcr.io/${{ github.repository }}
-          - europe-north1-docker.pkg.dev/nais-io/nais/images/nais-verification # For some reason ${{ env.GOOGLE_REGISTRY }} doesn't work here
-    steps:
-      - uses: actions/checkout@9a9194f87191a7e9055e3e9b95b8cfb13023bb08 # ratchet:actions/checkout@v3
-      - name: Install cosign
-        uses: sigstore/cosign-installer@d7543c93d881b35a8faa02e8e3605f69b7a1ce62 # ratchet:sigstore/cosign-installer@main
-        with:
-          cosign-release: 'v2.2.1'
-      - id: "auth"
-        if: github.ref == 'refs/heads/main'
-        name: "Authenticate to Google Cloud"
-        uses: "google-github-actions/auth@b7593ed2efd1c1617e1b0254da33b86225adb2a5" # ratchet:google-github-actions/auth@v2.1.12
-        with:
-          workload_identity_provider: ${{ secrets.NAIS_IO_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: "gh-nais-verification@nais-io.iam.gserviceaccount.com"
-          token_format: "access_token"
-      - name: Login to Google Artifact Registry
-        if: github.ref == 'refs/heads/main'
-        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # ratchet:docker/login-action@v2
-        with:
-          registry: ${{ env.GOOGLE_REGISTRY }}
-          username: "oauth2accesstoken"
-          password: "${{ steps.auth.outputs.access_token }}"
-      - name: Login to GitHub Packages Docker Registry
-        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # ratchet:docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: "Pull latest image so it exists locally and can be used by cache :crossed_fingers:"
-        run: docker pull "${{ matrix.image_base }}:latest"
-        continue-on-error: true
-      - name: Install earthly
-        uses: earthly/actions-setup@43211c7a0eae5344d6d79fb4aaf209c8f8866203 # ratchet:earthly/actions-setup@v1
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and possibly push
-        env:
-          EARTHLY_PUSH: "${{ github.ref == 'refs/heads/main' }}"
-          EARTHLY_USE_INLINE_CACHE: true
-          EARTHLY_SAVE_INLINE_CACHE: true
-          EARTHLY_VERBOSE: true
-          EARTHLY_FULL_TARGET: true
-          EARTHLY_OUTPUT: true
-        run: |
-          earthly "--remote-cache=${cache_image}" +docker "--IMAGE_BASE=${{ matrix.image_base }}" "--VERSION=${{ needs.version.outputs.version }}"
-      - name: Retrieve image digest
-        id: imgdigest
-        if: github.ref == 'refs/heads/main'
-        run: |
-          docker pull "${{ matrix.image_base }}:${{ needs.version.outputs.version }}"
-          echo "digest=$(docker inspect ${{ matrix.image_base }}:${{ needs.version.outputs.version }} | jq -r '.[].RepoDigests[0]')" >> $GITHUB_OUTPUT
-      - name: Sign the container image
-        if: github.ref == 'refs/heads/main'
-        run: cosign sign --yes ${{ steps.imgdigest.outputs.digest }}
-      - name: Create SBOM
-        if: github.ref == 'refs/heads/main'
-        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # ratchet:aquasecurity/trivy-action@0.33.1
-        with:
-          scan-type: 'image'
-          format: 'cyclonedx'
-          output: 'cyclone.sbom.json'
-          image-ref: ${{ steps.imgdigest.outputs.digest }}
-      - name: Attest image
-        if: github.ref == 'refs/heads/main'
-        run: cosign attest --yes --predicate cyclone.sbom.json --type cyclonedx ${{ steps.imgdigest.outputs.digest }}
-
-  chart:
-    permissions:
-      contents: 'read'
-      id-token: 'write'
-    name: Build and push chart
-    runs-on: ubuntu-latest
-    needs:
-      - version
-    steps:
-      - uses: actions/checkout@9a9194f87191a7e9055e3e9b95b8cfb13023bb08 # ratchet:actions/checkout@v3
-      - id: 'auth'
-        if: github.ref == 'refs/heads/main'
-        name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@b7593ed2efd1c1617e1b0254da33b86225adb2a5' # ratchet:google-github-actions/auth@v2.1.12
-        with:
-          workload_identity_provider: ${{ secrets.NAIS_IO_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: 'gh-nais-verification@nais-io.iam.gserviceaccount.com'
-          token_format: 'access_token'
-      - name: 'Set up Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@cb1e50a9932213ecece00a606661ae9ca44f3397' # ratchet:google-github-actions/setup-gcloud@v1
-      - name: 'Log in to Google Artifact Registry'
-        if: github.ref == 'refs/heads/main'
-        run: |-
-          echo '${{ steps.auth.outputs.access_token }}' | docker login -u oauth2accesstoken --password-stdin https://${{ env.GOOGLE_REGISTRY }}
-      - uses: azure/setup-helm@1a275c3b69536ee54be43f2070a358922e12c8d4 # ratchet:azure/setup-helm@v4
-        name: 'Setup Helm'
-        with:
-          version: '3.8.0'
-      - name: Set versions
-        run: |-
-          for chart in charts/*; do
-            yq e '.version = "${{ needs.version.outputs.version }}"' --inplace "${chart}/Chart.yaml"
-            yq e '.image.tag = "${{ needs.version.outputs.version }}"' --inplace "${chart}/values.yaml"
-          done
-      - name: Build Chart
-        run: |-
-          for chart in charts/*; do
-            helm package "$chart"
-          done
-      - name: Push Chart
-        if: github.ref == 'refs/heads/main'
-        run: |-
-          for chart in *.tgz; do
-            helm push "$chart" oci://${{ env.GOOGLE_REGISTRY }}/nais-io/nais/feature
-          done
-
-  rollout:
-    name: Rollout
-    if: github.actor != 'dependabot[bot]' && github.ref == 'refs/heads/main'
-    needs:
-      - version
-      - build
-      - chart
-    runs-on: fasit-deploy
-    permissions:
-      id-token: write
-    steps:
-      - uses: nais/fasit-deploy@v2 # ratchet:exclude
-        with:
-          chart: oci://${{ env.GOOGLE_REGISTRY }}/nais-io/nais/feature/nais-verification
-          version: ${{ needs.version.outputs.version }}
+  deploy:
+    uses: nais/actions/.github/workflows/mise-build-deploy-fasit.yaml@main
+    with:
+      builds-chart: true
+      deploys-to-fasit: true
+      mise-tasks: '["lint", "test"]'
+    secrets:
+      NAIS_IO_WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.NAIS_IO_WORKLOAD_IDENTITY_PROVIDER }}

@@ -1,0 +1,17 @@
+[tools]
+poetry = "latest"
+python = "3.12"
+
+[tasks.version]
+run = """
+echo "$(date +%Y%m%d%H%M%S)-$(git describe --always --dirty --exclude '*')"
+"""
+
+[tasks.build]
+run = "poetry install"
+
+[tasks.lint]
+run = "poetry run prospector"
+
+[tasks.test]
+run = "poetry run pytest"
