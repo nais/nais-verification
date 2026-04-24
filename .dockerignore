@@ -1,0 +1,14 @@
+.git
+.github
+charts
+hack
+misc
+*.md
+!README.md
+__pycache__
+.venv
+dist
+.pytest_cache
+.ruff_cache
+.mypy_cache
+.idea
