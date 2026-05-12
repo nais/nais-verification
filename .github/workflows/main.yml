@@ -11,12 +11,29 @@ permissions:
   id-token: write
 
 jobs:
-  deploy:
+  build:
     uses: nais/actions/.github/workflows/mise-build-deploy-fasit.yaml@main
     with:
       builds-chart: true
       builds-docker: true
-      deploys-to-fasit: true
       mise-tasks: '["lint", "test", "fmt-check"]'
     secrets:
       NAIS_IO_WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.NAIS_IO_WORKLOAD_IDENTITY_PROVIDER }}
+
+  deploy:
+    name: Deploy
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: fasit-deploy
+    permissions:
+      id-token: write
+    steps:
+      - uses: nais/fasit-deploy@58a70a338b16dc646373c91724fc7e7522d085a4 # ratchet:nais/fasit-deploy@v4.0.1
+        with:
+          chart: oci://europe-north1-docker.pkg.dev/nais-io/nais/charts/${{ needs.build.outputs.name }}
+          version: ${{ needs.build.outputs.version }}
+          targets: |
+            [
+              { "target": { "kind": "management", "tenant": "ci-nais" }, "wait": true },
+              { "target": { "kind": "management" } }
+            ]
