@@ -1,8 +1,9 @@
 import logging
+from pprint import pformat
+
 from gql import Client, gql
 from gql.transport.exceptions import TransportQueryError
 from gql.transport.requests import RequestsHTTPTransport
-from pprint import pformat
 
 from nais_verification.auth import BearerAuth
 from nais_verification.settings import Settings

@@ -1,11 +1,12 @@
 import logging
+from pprint import pformat
+
 from gql import Client, gql
 from gql.transport.exceptions import TransportQueryError
 from gql.transport.requests import RequestsHTTPTransport
 from k8s import config
 from k8s.models.common import ObjectMeta
 from k8s.models.secret import Secret
-from pprint import pformat
 
 from nais_verification.auth import BearerAuth
 from nais_verification.settings import Settings

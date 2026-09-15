@@ -3,10 +3,13 @@ import argparse
 import enum
 import logging
 import sys
+
 from fiaas_logging import init_logging
 from gql.transport.requests import log as requests_logger
 
-from nais_verification.deploy_key import create_deploy_key  # NOQA: Imported for dynamic lookup
+from nais_verification.deploy_key import (
+    create_deploy_key,  # NOQA: Imported for dynamic lookup
+)
 from nais_verification.settings import Settings
 from nais_verification.team import create_team  # NOQA: Imported for dynamic lookup
 
