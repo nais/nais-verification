@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 import argparse
 import enum
 import logging
@@ -8,10 +9,12 @@ from fiaas_logging import init_logging
 from gql.transport.requests import log as requests_logger
 
 from nais_verification.deploy_key import (
-    create_deploy_key,  # NOQA: Imported for dynamic lookup
+    create_deploy_key,  # imported for dynamic lookup
 )
 from nais_verification.settings import Settings
-from nais_verification.team import create_team  # NOQA: Imported for dynamic lookup
+from nais_verification.team import create_team  # imported for dynamic lookup
+
+LOG = logging.getLogger(__name__)
 
 
 class Actions(enum.Enum):
@@ -43,8 +46,8 @@ def main():
     options = parser.parse_args()
     try:
         options.action.execute(options.dry_run)
-    except Exception as e:
-        logging.exception("An error occured: %s", e)
+    except Exception:
+        LOG.exception("An error occured")
         sys.exit(127)
 
 
