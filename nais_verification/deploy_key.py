@@ -71,7 +71,7 @@ def _get_team_deploy_key(settings: Settings) -> str:
     try:
         result = client.execute(query, variable_values=params)
         LOG.debug("result from getDeployKey query: %s", pformat(result))
-        deploy_key = result["data"]["team"]["deploymentKey"]["key"]
+        deploy_key = result["team"]["deploymentKey"]["key"]
         return deploy_key
     except KeyError as e:
         LOG.error("No deploy key returned:\n\t%s", _format_errors(e))
