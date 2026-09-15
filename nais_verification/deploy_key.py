@@ -54,8 +54,7 @@ def _get_team_deploy_key(settings: Settings) -> str:
     )
     client = Client(transport=transport, fetch_schema_from_transport=True)
 
-    query = gql(
-        """
+    query = gql("""
         query getDeployKey($slug: Slug!) {
           team(slug: $slug) {
             deploymentKey {
@@ -63,8 +62,7 @@ def _get_team_deploy_key(settings: Settings) -> str:
             }
           }
         }
-        """
-    )
+        """)
     params = {
         "slug": settings.TEAM_NAME,
     }
@@ -72,7 +70,7 @@ def _get_team_deploy_key(settings: Settings) -> str:
     try:
         result = client.execute(query, variable_values=params)
         LOG.debug("result from getDeployKey query: %s", pformat(result))
-        deploy_key = result["team"]["deploymentKey"]["key"]
+        deploy_key = result["data"]["team"]["deploymentKey"]["key"]
         return deploy_key
     except KeyError as e:
         LOG.error("No deploy key returned:\n\t%s", _format_errors(e))
