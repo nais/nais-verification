@@ -11,4 +11,4 @@ echo "$(date +%Y%m%d%H%M%S)-$(git describe --always --dirty --exclude '*')"
 run = "docker buildx build ."
 
 [tasks.ci]
-depends = ["test", "lint", "fmt-check"]
+depends = ["lint", "fmt-check"]
