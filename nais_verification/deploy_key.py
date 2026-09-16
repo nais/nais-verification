@@ -16,7 +16,9 @@ LOG = logging.getLogger(__name__)
 
 def create_deploy_key(dry_run: bool):
     settings = Settings()
-    deploy_key = _get_team_deploy_key(settings)
+    deploy_key = _get_team_deploy_key(dry_run, settings)
+    if deploy_key is None:
+        return
     _save_key_to_cluster(dry_run, settings, deploy_key)
 
 
@@ -48,7 +50,7 @@ def _save_key_to_cluster(dry_run: bool, settings: Settings, deploy_key: str):
         LOG.info("Created secret %s", object_meta)
 
 
-def _get_team_deploy_key(settings: Settings) -> str:
+def _get_team_deploy_key(dry_run: bool, settings: Settings) -> str | None:
     auth = BearerAuth(settings.NAIS_TEAMS_API_TOKEN)
     transport = RequestsHTTPTransport(
         settings.NAIS_TEAMS_API_URL, auth=auth, verify=True
@@ -71,14 +73,46 @@ def _get_team_deploy_key(settings: Settings) -> str:
     try:
         result = client.execute(query, variable_values=params)
         LOG.debug("result from getDeployKey query: %s", pformat(result))
-        deploy_key = result["team"]["deploymentKey"]["key"]
-        return deploy_key
-    except KeyError as e:
-        LOG.error("No deploy key returned:\n\t%s", _format_errors(e))
-        raise RuntimeError("Failed to get deploy key") from e
     except TransportQueryError as e:
         LOG.error("Failed to get deploy key:\n\t%s", _format_errors(e))
         raise RuntimeError("Failed to get deploy key") from e
+
+    deploy_key = (result.get("team") or {}).get("deploymentKey")
+    if deploy_key is not None:
+        LOG.info("Found existing deploy key")
+        return deploy_key["key"]
+
+    return _create_team_deploy_key(client, dry_run, settings)
+
+
+def _create_team_deploy_key(client, dry_run: bool, settings: Settings) -> str | None:
+    mutation = gql("""
+        mutation RotateDeployKey($team: Slug!) {
+          changeDeploymentKey(input: { teamSlug: $team }) {
+            deploymentKey {
+              key
+            }
+          }
+        }
+        """)
+    params = {
+        "team": settings.TEAM_NAME,
+    }
+    LOG.info("No deploy key found, creating one for team %r", settings.TEAM_NAME)
+    if dry_run:
+        LOG.info("Dry run, not creating deploy key")
+        return None
+    try:
+        result = client.execute(mutation, variable_values=params)
+        LOG.debug("result from RotateDeployKey mutation: %s", pformat(result))
+    except TransportQueryError as e:
+        LOG.error("Failed to create deploy key:\n\t%s", _format_errors(e))
+        raise RuntimeError("Failed to create deploy key") from e
+    try:
+        return result["changeDeploymentKey"]["deploymentKey"]["key"]
+    except (KeyError, TypeError) as e:
+        LOG.error("No deploy key in mutation result: %s", pformat(result))
+        raise RuntimeError("Failed to create deploy key") from e
 
 
 def _format_errors(e):
