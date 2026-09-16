@@ -14,9 +14,9 @@ jobs:
   build:
     uses: nais/actions/.github/workflows/mise-build-deploy-fasit.yaml@7fb66e62631858376c97cb0b58cb04d06b81743c
     with:
-      builds-chart: true
       builds-docker: true
-      deploys-to-fasit: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+      builds-chart: true
+      deploys-to-fasit: true
       mise-tasks: '["lint", "fmt-check"]'
       targets: |
         [
