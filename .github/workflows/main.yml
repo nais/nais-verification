@@ -16,7 +16,7 @@ jobs:
     with:
       builds-chart: true
       builds-docker: true
-      deploys-to-fasit: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      deploys-to-fasit: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
       mise-tasks: '["lint", "fmt-check"]'
       targets: |
         [
