@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   build:
-    uses: nais/actions/.github/workflows/mise-build-deploy-fasit.yaml@602637a7900ef2b09cc73ac3b845307ca1ea9f52
+    uses: nais/actions/.github/workflows/mise-build-deploy-fasit.yaml@7fb66e62631858376c97cb0b58cb04d06b81743c
     with:
       builds-chart: true
       builds-docker: true
